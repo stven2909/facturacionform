@@ -363,29 +363,32 @@ facturaForm.addEventListener('submit', async (e) => {
         ? ordenActual.items.map(i => `${i.cantidad}x ${i.producto}`).join(', ') 
         : '';
 
-    const datos = {
-        // Mapeo corregido según los logs que pasaste:
-        trackingPOS: ordenActual.tracking_number || '', 
-        factura: ordenActual.ticket || '',              // Odoo devuelve 'ticket'
-        cliente: ordenActual.atendido_por || 'Consumidor Final', 
-        tipoDTE: dteSeleccionado.codigo,
-        nombreDTE: dteSeleccionado.nombre,
-        nombre: document.getElementById('nombre').value.trim(),
-        nit: document.getElementById('nit').value.trim(),
-        nrc: document.getElementById('nrc').value.trim(),
-        dui: document.getElementById('dui').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        telefono: document.getElementById('telefono').value.trim(),
-        giro: document.getElementById('giro').value.trim(),
-        direccion: document.getElementById('direccion').value.trim(),
-        departamento: document.getElementById('departamento').value,
-        municipio: document.getElementById('municipio').value.trim(),
-        itemsTexto: textoDeItems,                       // Se mapea a la columna 17 del Sheet
-        totalOrden: ordenActual.total || '0.00'         // Se mapea a la columna 18 del Sheet
-    };
-
-    // Logs para que tú mismo verifiques en consola antes de que se limpie la pantalla
-    console.log('✅ Datos finales preparados para el Sheet:', datos);
+        const datos = {
+            // MAPEAMOS SEGÚN EL JSON QUE ME ACABAS DE PASAR:
+            trackingPOS: ordenActual.tracking_number || '', // Antes tenías .trackingPOS (incorrecto)
+            factura: ordenActual.ticket || '',              // Antes tenías .factura (incorrecto)
+            cliente: ordenActual.atendido_por || '',        // Antes tenías .cliente (incorrecto)
+            
+            // Datos del formulario (Estos están bien si los IDs en tu HTML coinciden)
+            tipoDTE: dteSeleccionado.codigo,
+            nombreDTE: dteSeleccionado.nombre,
+            nombre: document.getElementById('nombre').value.trim(),
+            nit: document.getElementById('nit').value.trim(),
+            nrc: document.getElementById('nrc').value.trim(),
+            dui: document.getElementById('dui').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            telefono: document.getElementById('telefono').value.trim(),
+            giro: document.getElementById('giro').value.trim(),
+            direccion: document.getElementById('direccion').value.trim(),
+            departamento: document.getElementById('departamento').value,
+            municipio: document.getElementById('municipio').value.trim(),
+            
+            // Datos finales para el Sheet
+            itemsTexto: textoDeItems,
+            totalOrden: ordenActual.total || '0.00'
+        };
+    
+        console.log('Enviando estos datos al Sheet:', datos);
 
     btnEnviar.disabled = true;
     btnEnviarText.textContent = 'Enviando...';
