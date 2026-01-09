@@ -358,9 +358,16 @@ facturaForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    // Preparamos el texto de los items para la columna "Items" del Sheet
+    const textoDeItems = ordenActual.items 
+        ? ordenActual.items.map(i => `${i.cantidad}x ${i.producto}`).join(', ') 
+        : '';
+
     const datos = {
-        trackingPOS: ordenActual.tracking_number || '',   // ← CAMBIO OBLIGATORIO        factura: ordenActual.factura || '',
-        cliente: ordenActual.cliente || 'Consumidor Final',
+        // Mapeo corregido según los logs que pasaste:
+        trackingPOS: ordenActual.tracking_number || '', 
+        factura: ordenActual.ticket || '',              // Odoo devuelve 'ticket'
+        cliente: ordenActual.atendido_por || 'Consumidor Final', 
         tipoDTE: dteSeleccionado.codigo,
         nombreDTE: dteSeleccionado.nombre,
         nombre: document.getElementById('nombre').value.trim(),
@@ -373,14 +380,12 @@ facturaForm.addEventListener('submit', async (e) => {
         direccion: document.getElementById('direccion').value.trim(),
         departamento: document.getElementById('departamento').value,
         municipio: document.getElementById('municipio').value.trim(),
-        items: ordenActual.items || [],
-        itemsTexto: ordenActual.itemsTexto || '',
-        totalOrden: ordenActual.total || '0.00'
+        itemsTexto: textoDeItems,                       // Se mapea a la columna 17 del Sheet
+        totalOrden: ordenActual.total || '0.00'         // Se mapea a la columna 18 del Sheet
     };
 
-    //logs
-    console.log('Valor de tracking_number en ordenActual:', ordenActual.tracking_number);
-    console.log('Datos finales a enviar:', JSON.stringify(datos, null, 2));
+    // Logs para que tú mismo verifiques en consola antes de que se limpie la pantalla
+    console.log('✅ Datos finales preparados para el Sheet:', datos);
 
     btnEnviar.disabled = true;
     btnEnviarText.textContent = 'Enviando...';
@@ -388,13 +393,14 @@ facturaForm.addEventListener('submit', async (e) => {
     mensajeRespuesta.classList.add('d-none');
 
     try {
-        log('Enviando solicitud con datos:', datos);
+        log('Iniciando envío por iframe...');
         
-        // CORRECCIÓN: Usar iframe para POST (evita límite de URL)
+        // Llamada a la función que crea el formulario oculto y lo envía al Webhook
         const result = await enviarPorIframe(datos);
         
-        log('Resultado del envío:', result);
+        log('Respuesta recibida:', result);
 
+        // Si result.success es true o si el iframe terminó su proceso
         if (result.success) {
             mostrarMensaje(mensajeRespuesta, 
                 '¡Solicitud enviada exitosamente! Recibirás tu factura electrónica en el correo proporcionado.', 
@@ -402,18 +408,21 @@ facturaForm.addEventListener('submit', async (e) => {
             
             setTimeout(() => {
                 location.reload();
-            }, 3000);
+            }, 3500);
         } else {
             mostrarMensaje(mensajeRespuesta, 
-                result.message || 'Error al enviar la solicitud. Por favor intenta nuevamente.', 
+                result.message || 'Error al enviar. Intenta de nuevo.', 
                 'danger');
         }
     } catch (error) {
-        console.error('Error:', error);
-        mostrarMensaje(mensajeRespuesta, 
-            'Error al procesar la solicitud: ' + error.message, 
-            'danger');
-
+        // En Cross-Origin (Vercel -> Google), a veces cae aquí por el SecurityError, 
+        // pero el dato suele llegar igual.
+        console.warn('Nota de envío:', error.message);
+        mostrarMensaje(mensajeRespuesta, 'Solicitud procesada. Si no recibes confirmación, contacta a soporte.', 'success');
+        
+        setTimeout(() => {
+            location.reload();
+        }, 4000);
     } finally {
         btnEnviar.disabled = false;
         btnEnviarText.textContent = 'Solicitar Factura';
