@@ -359,8 +359,7 @@ facturaForm.addEventListener('submit', async (e) => {
     }
 
     const datos = {
-        trackingPOS: ordenActual.tracking_number || '',          // ¡Este es el campo correcto!
-        factura: ordenActual.factura || '',
+        trackingPOS: ordenActual.tracking_number || '',   // ← CAMBIO OBLIGATORIO        factura: ordenActual.factura || '',
         cliente: ordenActual.cliente || 'Consumidor Final',
         tipoDTE: dteSeleccionado.codigo,
         nombreDTE: dteSeleccionado.nombre,
