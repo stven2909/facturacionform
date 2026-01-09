@@ -359,9 +359,9 @@ facturaForm.addEventListener('submit', async (e) => {
     }
 
     const datos = {
-        trackingPOS: ordenActual.trackingPOS,
-        factura: ordenActual.factura,
-        cliente: ordenActual.cliente,
+        trackingPOS: ordenActual.tracking_number || '',          // ¡Este es el campo correcto!
+        factura: ordenActual.factura || '',
+        cliente: ordenActual.cliente || 'Consumidor Final',
         tipoDTE: dteSeleccionado.codigo,
         nombreDTE: dteSeleccionado.nombre,
         nombre: document.getElementById('nombre').value.trim(),
@@ -374,7 +374,6 @@ facturaForm.addEventListener('submit', async (e) => {
         direccion: document.getElementById('direccion').value.trim(),
         departamento: document.getElementById('departamento').value,
         municipio: document.getElementById('municipio').value.trim(),
-        // ← AGREGAR ITEMS Y TOTAL
         items: ordenActual.items || [],
         itemsTexto: ordenActual.itemsTexto || '',
         totalOrden: ordenActual.total || '0.00'
