@@ -409,6 +409,9 @@ facturaForm.addEventListener('submit', async (e) => {
         mostrarMensaje(mensajeRespuesta, 
             'Error al procesar la solicitud: ' + error.message, 
             'danger');
+
+            console.log('Valor de tracking_number en ordenActual:', ordenActual.tracking_number);
+    console.log('Datos finales a enviar:', JSON.stringify(datos, null, 2));
     } finally {
         btnEnviar.disabled = false;
         btnEnviarText.textContent = 'Solicitar Factura';
