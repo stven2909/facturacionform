@@ -378,6 +378,10 @@ facturaForm.addEventListener('submit', async (e) => {
         totalOrden: ordenActual.total || '0.00'
     };
 
+    //logs
+    console.log('Valor de tracking_number en ordenActual:', ordenActual.tracking_number);
+    console.log('Datos finales a enviar:', JSON.stringify(datos, null, 2));
+
     btnEnviar.disabled = true;
     btnEnviarText.textContent = 'Enviando...';
     btnEnviarSpinner.classList.remove('d-none');
@@ -410,8 +414,6 @@ facturaForm.addEventListener('submit', async (e) => {
             'Error al procesar la solicitud: ' + error.message, 
             'danger');
 
-            console.log('Valor de tracking_number en ordenActual:', ordenActual.tracking_number);
-    console.log('Datos finales a enviar:', JSON.stringify(datos, null, 2));
     } finally {
         btnEnviar.disabled = false;
         btnEnviarText.textContent = 'Solicitar Factura';
